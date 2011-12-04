@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    {{#logo?}}
+      <img id="logo" src="{{ logo }}"/>
+    {{/logo}}
+
+    <a href="#" class="brand">{{ title }}</a>
+
+    <ul class="nav">
+      <li><a href="#">Authentication</a></li>
+      <li><a href="#">Users</a></li>
+      <li><a href="#">Contacts</a></li>
+      <li><a href="#">Groups</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="container">
+  <div id="background"></div>
+  <table cellspacing="0" cellpadding="0">
+  <thead>
+    <tr>
+      <th class="docs"><h1>{{ title }}</h1></th>
+      <th class="code"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#tuples}}
+    <tr>
+      <td class="docs">
+        {{{ docs }}}
+      </td>
+      <td class="code">
+        {{{ code }}
+      </td>
+    </tr>
+    {{/tuples}}
+  </table>
+</div>
+</body>
+</html>
