@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 require "nokogiri"
 require "mustache"
 require "i18n"
@@ -17,9 +19,4 @@ require "api_guides/views/example"
 require "api_guides/views/reference"
 
 module ApiGuides
-  extend self
-
-  def generate(attributes)
-    Generator.new(attributes).generate
-  end
 end

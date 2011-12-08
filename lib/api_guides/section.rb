@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 module ApiGuides
   # This class is simply a structure to hold the docs
   # and the examples.

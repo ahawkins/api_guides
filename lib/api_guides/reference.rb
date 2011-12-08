@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 module ApiGuides
   # This class models a <reference> element in a document.
   # It will always be shown with the associated section.

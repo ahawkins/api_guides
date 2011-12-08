@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 module ApiGuides
   # This class models an example for your documentation.
   # It is for a specific language and contains a raw

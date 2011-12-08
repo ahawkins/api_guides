@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 module ApiGuides
   # Represents a HTML page that can be generated using Mustache.
   class Page < ::Mustache

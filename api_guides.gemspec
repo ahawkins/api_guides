@@ -4,9 +4,9 @@ require File.expand_path('../lib/api_guides/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Adam Hawkins"]
   gem.email         = ["me@broadcastingadam.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{Generate HTML documentation for your program with markdown and examples for different languages.}
+  gem.summary       = %q{}
+  gem.homepage      = "https://github.com/adman65/api_guides"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
