@@ -27,9 +27,9 @@ module ApiGuides
   #     |- sytle.css
   #     |- logo.png
   #     |- index.html
-  #     |- ruby_examples.html
-  #     |- phython_examples.html
-  #     |- objective_c_examples.html
+  #     |- ruby.html
+  #     |- phython.html
+  #     |- objective_c.html
   #
   # Once you have the site you can use any webserver you want to serve it up!
   #
@@ -50,6 +50,8 @@ module ApiGuides
   #
   #     generator.generate
   class Generator
+    extend ActiveSupport::Memoizable
+
     attr_accessor :source_path, :site_path, :default, :title, :logo
 
     # You can instatiate a new generator by passing a hash of attributes
@@ -61,7 +63,7 @@ module ApiGuides
     #     })
     #
     # You can also omit the hash if you like.
-    def intialize(attributes = {})
+    def initialize(attributes = {})
       attributes.each_pair do |attribute, value|
         self.send("#{attribute}=", value)
       end
@@ -73,61 +75,85 @@ module ApiGuides
     # ensure that a clean site is generated each time.
     #
     # It reads all the xml documents according to `source_path/**/*.xml` 
-    # and uses their sections to create the HTML.
+    # and uses them to create the HTML.
     #
     # Documents are rendered in the order specified `#position`.
     def generate
-      # Parse all the documents specified recusively in the `source_path`
-      documents = Dir["#{source_path}/**/*.xml"].map do |path|
-        Document.new(path)
-      end
+      # Ensure site is a directory
+      FileUtils.mkdir_p site_path
 
-      documents = documents.sort {|d1, d2| d1.position <=> d2.position }
+      # If there is more than one language, then we need to create
+      # multiple files, one for each language.
+      if languages.size >= 1
 
-      # Now collect all the different languages
-      languages = documents.collect { examples.map { |ex| ex.language }}.compact.uniq
+        # Enter the most dastardly loop. 
+        # Create a View::Document with sections only containing the 
+        # specified language. 
+        languages.map do |language|
+          document_views = documents.map do |document|
+            document.sections = document.sections.map do |section|
+              section.examples = section.examples.select {|ex| ex.language.blank? || ex.language == language }
+              section
+            end
 
-      # Use the list of languages to parse the document's sections of code
-      # and examples into tuples. We can pass that off to a mustache template
-      # for rendering. Then we can store the contents to file. We need to repeat
-      # this process for each language.
+            Views::Document.new document
+          end
 
-      languages.map do |language|
-        tuples = documents.collect(&:sections).inject([]) do |tuples, section|
-          tuple = Tuple.new
+          # Use Mustache to create the file
+          page = Page.new
+          page.title = title
+          page.logo = File.basename logo if logo
+          page.documents = document_views
 
-          tuple.docs = left_align section.docs
+          File.open("#{site_path}/#{language.underscore}.html", "w") do |file|
+            file.puts page.render
+          end
+        end
 
-          example = section.examples.select {|ex| ex.language == language }.first
-          tuple.code = left_align(example.content) if example
+        # copy the default language to the index and were done!
+        FileUtils.cp "#{site_path}/#{default.underscore}.html", "#{site_path}/index.html"
+
+      # There are no languages specified, so we can just create one page
+      # using a collection of Document::View.
+      else 
+        document_views = documents.map do |document|
+          Views::Document.new document
         end
 
         page = Page.new
         page.title = title
-        page.logo = logo
-        page.tuples = tuples
+        page.logo = File.basename logo if logo
+        page.documents = document_views
 
-        File.open("#{site_path}/#{language.underscore}_html") do |file|
+        File.open("#{site_path}/index.html", "w") do |file|
           file.puts page.render
         end
       end
 
+      # Copy the logo if specified
+      FileUtils.cp "#{logo}", "#{site_path}/#{File.basename(logo)}" if logo
 
-      # Copy the stylesheet into the site directory
+      # Copy all the stylesheets into the static directory and that's it!
       resources_path = File.expand_path "../resources", __FILE__
 
       FileUtils.cp "#{resources_path}/style.css", "#{site_path}/style.css"
-
-      # Copy the logo if specified
-      FileUtils.cp "#{logo}", "#{site_path}/#{File.basename(logo)}"
-
-      # copy the default language to the index and were done!
-      FileUtils.cp "#{site_path}/#{default.underscore}", "#{site_path}/index.html"
+      FileUtils.cp "#{resources_path}/syntax.css", "#{site_path}/syntax.css"
     end
 
-    private 
-    class Tuple
-      attr_accessor :docs, :code
+    private
+    # Parse and sort all the documents specified recusively in the `source_path`
+    def documents
+      Dir["#{source_path}/**/*.xml"].map do |path|
+        Document.from_xml File.read(path)
+      end.sort {|d1, d2| d1.position <=> d2.position }
     end
+
+    # Loop all the document's sections and examples to see all the different
+    # languages specified by this document.
+    def languages
+      documents.collect(&:sections).flatten.collect(&:examples).flatten.map(&:language).compact.uniq
+    end
+    # Store this calculation for later so we don't have to do this retarded loop again.
+    memoize :languages
   end
 end

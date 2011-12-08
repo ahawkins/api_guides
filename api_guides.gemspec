@@ -15,8 +15,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = ApiGuides::VERSION
 
-  gem.add_dependency 'redcarpet'
   gem.add_dependency 'mustache'
+  gem.add_dependency 'redcarpet', '~> 2.0'
   gem.add_dependency 'nokogiri'
   gem.add_dependency 'activesupport', '~> 3.0'
   gem.add_dependency 'i18n'

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" type="text/css" href="./syntax.css" />
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+</head>
+<body>
+
+<div id="topbar">
+  {{#logo}}
+    <img id="logo" src="{{ logo }}"/>
+  {{/logo}}
+
+  <a href="#" class="brand">{{ title }}</a>
+
+  <ul class="nav">
+    <li id="toc">
+      <a href="#">Table of Contents</a>
+      <div id="table-of-contents">
+        {{#documents}}
+          <section>
+            <a class="header" href="#{{id}}">{{title}}</a>
+            <ol>
+              {{#sections}}
+                {{#title}}
+                  <li class="sub-section"><a href="#{{id}}">{{title}}</a></li>
+                {{/title}}
+              {{/sections}}
+            </ol>
+          </section>
+        {{/documents}}
+      </div>
+    </li>
+    {{#links}}
+      <li><a href="#{{href}}">{{name}}</a></li>
+    {{/links}}
+  </ul>
+</div>
+
+
+<div id="container">
+  <div id="background"></div>
+  {{#documents}}
+    <table cellspacing="0" cellpadding="0">
+      <thead>
+        <tr>
+          <th class="docs">
+            <h1 id="{{id}}">{{title}}</h1>
+          </th>
+          <th class="code">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#sections}}
+          <tr>
+            <td class="docs">
+              <h2 id="{{id}}">{{title}}</h2>
+
+              {{{ docs }}}
+            </td>
+            <td class="code">
+              {{#reference}}
+                <h2 id="{{id}}">{{title}}</h2>
+                {{{ content }}}
+              {{/reference}}
+
+              {{#examples}}
+                {{{ content }}}
+              {{/examples}}
+            </td>
+          </tr>
+        {{/sections}}
+      <tbody>
+    </table>
+  {{/documents}}
+</div>
+</body>
+</html>

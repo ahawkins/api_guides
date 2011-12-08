@@ -1,14 +1,29 @@
+require 'active_support/core_ext/object'
+
 module ApiGuides
   # The document class models the raw information in each guide.
+  #
   # The document is parsed according to this format:
   #
   #     <document>
   #       <title>Top Level Header</title>
   #       <position>1<>
-  #       <section>
+  #       <section title="Level Two Header">
   #         <docs>
   #           Insert your markdown here
   #         </docs>
+  #         <reference title="Example1">
+  #           A Reference element will always be shown with the associated section.
+  #           You should use this area to provide technical documentation
+  #           for each section. You could use the <docs>'s element to
+  #           describe how each thing works, and use the reference to show
+  #           a method signature with return values.
+  #
+  #           Write your reference with markdown.
+  #
+  #           You can use standard markdown syntax plus 
+  #           helpers added by this library
+  #         </reference>
   #         <examples>
   #           <example language="ruby"><![CDATA[
   #             Insert your markdown here.
@@ -67,90 +82,28 @@ module ApiGuides
   # left-aligned so code and other indentation senstive markdown will be
   # parsed correctly.
   class Document
-    # Creates a document from an absolute file name.
-    # Here is an example:
-    #
-    #     ApiGuides::Document.new "/absolute/path/to/file.xml"
-    #
-    # You should never interact with this class directly though.
-    def initialize(source_file)
-      @source = source_file
-    end
+    # Use ActiveSupport to memoize parsing methods
+    extend ActiveSupport::Memoizable
 
-    # Returns the title based from the <title> element
-    def title
-      xml.at_xpath('/document/title').content
-    end
+    attr_accessor :title, :position, :sections
 
-    # Returns the position from the <position> element
-    def position
-      xml.at_xpath('/document/position').content.to_i
-    end
-
-    # Parses the document into a table of contents based
-    # on headers. Sections do not affect this at all.
-    # Here is an example of a markdown document with the generated
-    # table of contents:
-    #
-    #     <section>
-    #       # Top Level Header
-    #
-    #       ## Second Level Header
-    #
-    #       ## Another Header
-    #     </section>
-    #     <section>
-    #       ## More information
-    #
-    #       ### A subsection
-    #     </section>
-    #
-    # Would generate this TOC:
-    #
-    #     1. Top Level Header
-    #       1.1. Second Level Header
-    #       1.2. Another Header
-    #       1.3. More Information
-    #         1.3.1 A subsection
-    #
-    # Everything will be grouped under the top level header specified
-    # in the `<title>` element.
-    #
-    # The table of contents is used by the generator to assemble the index
-    # with links to the apporiate sections.
-    #
-    # It will only generate links up to H3 elements. H4, H5, H6 elements
-    # are simply ignored.
-    def table_of_contents
-
-    end
-
-    # Parses the document according to the <section> tags
-    # with the documents and examples.
-    #
-    # The sections are used by the generator to assemble the final document.
-    # They are rendered serially.
-    def sections
-      xml.xpath('//section').inject([]) do |memo, element|
-        section = Section.new
-        section.docs = element.at_xpath('./docs').content
-
-        section.examples = element.xpath('./examples/example').inject([]) do |exs, example_element|
-          example = Example.new
-          example.language = example_element.attributes['language'].value
-          example.content = example_element.content
-          exs << example
-          exs
-        end
-
-        memo << section
-        memo
+    def initialize(attributes = {})
+      attributes.each_pair do |attr, value|
+        send "#{attr}=", value
       end
     end
 
-    private
-    def xml
-      @xml ||= Nokogiri::XML.parse(@source.respond_to?(:read) ? @source.read : File.read(@source))
+    # Takes XML and parses into into a Document
+    # instance. It wil also parse the section
+    # using its `from_xml` method.
+    def self.from_xml(xml)
+      doc = Nokogiri::XML.parse(xml).at_xpath('//document')
+      document = Document.new :title => doc.at_xpath('./title').try(:content), 
+        :position => doc.at_xpath('./position').try(:content).try(:to_i)
+
+      document.sections = doc.xpath('//section').map {|section_xml| Section.from_xml(section_xml.to_s) }
+
+      document
     end
   end
 end

@@ -1,0 +1,14 @@
+
+        <document>
+          <title>Using ApiGuides</title>
+          <position>1</position>
+          <section title="The Generator">
+            <docs>Docs</docs>
+            <reference title="Method Signature">Foobar</reference>
+            <examples>
+              <example language="ruby">ruby examples</example>
+              <example language="python">python examples</example>
+            </examples>
+          </section>
+        </document>
+      
