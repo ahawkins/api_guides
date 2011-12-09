@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>example.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="document.html">document.rb</a>
+          <a class="source" href="example.html">example.rb</a>
+          <a class="source" href="generator.html">generator.rb</a>
+          <a class="source" href="markdown_helper.html">markdown_helper.rb</a>
+          <a class="source" href="reference.html">reference.rb</a>
+          <a class="source" href="section.html">section.rb</a>
+          <a class="source" href="version.html">version.rb</a>
+          <a class="source" href="view_helper.html">view_helper.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>example.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>&ndash;<em>&ndash; encoding: utf-8 &ndash;</em>&ndash;</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="k">module</span> <span class="nn">ApiGuides</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>This class models an example for your documentation.
+It is for a specific language and contains a raw
+markdown formatted string. A diffrent version of the documentation
+will be generated for each language with examples.</p>
+
+<p>You never interact with this class directly.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">class</span> <span class="nc">Example</span>
+    <span class="kp">attr_accessor</span> <span class="ss">:language</span>
+    <span class="kp">attr_accessor</span> <span class="ss">:content</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{})</span>
+      <span class="n">attributes</span><span class="o">.</span><span class="n">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="kp">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+        <span class="nb">send</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="kp">attr</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="n">value</span>
+      <span class="k">end</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>Takes an XML representation and parse
+it into an Example instance. </p>
+
+<p>Here is XML format expected:</p>
+
+<pre><code>&lt;examle language=&ldquo;Foo&rdquo;&gt;
+  &lt;![CDATA[
+  Insert your markdown here
+  ]]&gt;
+&lt;/reference&gt;
+</code></pre>
+
+<p>This would set <code>#language</code> to &lsquo;Foo&rsquo;
+and #content to &lsquo;Insert your markdown here&rsquo;</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_xml</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+      <span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">XML</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span><span class="o">.</span><span class="n">at_xpath</span><span class="p">(</span><span class="s1">&#39;//example&#39;</span><span class="p">)</span>
+      <span class="no">Example</span><span class="o">.</span><span class="n">new</span> <span class="ss">:language</span> <span class="o">=&gt;</span> <span class="n">doc</span><span class="o">.</span><span class="n">attributes</span><span class="o">[</span><span class="s1">&#39;language&#39;</span><span class="o">].</span><span class="n">try</span><span class="p">(</span><span class="ss">:value</span><span class="p">),</span> <span class="ss">:content</span> <span class="o">=&gt;</span> <span class="n">doc</span><span class="o">.</span><span class="n">content</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

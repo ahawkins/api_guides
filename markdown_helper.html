@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>markdown_helper.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="document.html">document.rb</a>
+          <a class="source" href="example.html">example.rb</a>
+          <a class="source" href="generator.html">generator.rb</a>
+          <a class="source" href="markdown_helper.html">markdown_helper.rb</a>
+          <a class="source" href="reference.html">reference.rb</a>
+          <a class="source" href="section.html">section.rb</a>
+          <a class="source" href="version.html">version.rb</a>
+          <a class="source" href="view_helper.html">view_helper.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>markdown_helper.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>&ndash;<em>&ndash; encoding: utf-8 &ndash;</em>&ndash;</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;redcarpet&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;net/http&#39;</span>
+
+<span class="k">module</span> <span class="nn">ApiGuides</span>
+  <span class="k">module</span> <span class="nn">MarkdownHelper</span>
+    <span class="k">class</span> <span class="nc">HTMLwithHighlighting</span> <span class="o">&lt;</span> <span class="o">::</span><span class="no">Redcarpet</span><span class="o">::</span><span class="no">Render</span><span class="o">::</span><span class="no">HTML</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>Override the default so we can do syntax highlighting
+based on the language</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="k">def</span> <span class="nf">block_code</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>If there&rsquo;s a language, use the pygments webservice
+to highlight for the language</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>        <span class="k">if</span> <span class="n">language</span>
+          <span class="no">Net</span><span class="o">::</span><span class="no">HTTP</span><span class="o">.</span><span class="n">post_form</span><span class="p">(</span>
+            <span class="no">URI</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;http://pygments.appspot.com/&#39;</span><span class="p">),</span>
+            <span class="p">{</span><span class="s1">&#39;lang&#39;</span> <span class="o">=&gt;</span> <span class="n">language</span><span class="p">,</span> <span class="s1">&#39;code&#39;</span> <span class="o">=&gt;</span> <span class="n">code</span><span class="p">}</span>
+          <span class="p">)</span><span class="o">.</span><span class="n">body</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>fallback to standar</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>        <span class="k">else</span>
+          <span class="k">super</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>Simple helper to convert a string to markdown using
+all our custom hax (including syntax highligting).
+It uses Redcarpert to do the heavy lifting.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">markdown</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+      <span class="n">content</span> <span class="o">=</span> <span class="n">left_align</span> <span class="n">string</span>
+
+      <span class="n">md</span> <span class="o">=</span> <span class="o">::</span><span class="no">Redcarpet</span><span class="o">::</span><span class="no">Markdown</span><span class="o">.</span><span class="n">new</span> <span class="no">HTMLwithHighlighting</span><span class="p">,</span> <span class="ss">:auto_link</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span> 
+        <span class="ss">:no_intra_emphis</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+        <span class="ss">:tables</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span> 
+        <span class="ss">:fenced_code_blocks</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+        <span class="ss">:strikethrough</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+
+      <span class="n">md</span><span class="o">.</span><span class="n">render</span> <span class="n">content</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>Takes a string and removes trailing whitespace from the
+beginning of each line. It takes the number of leading whitespace
+characters from the first line and removes that from every single
+line in the string. It&rsquo;s used to normalize strings that may be
+intended when writing the XML documents.</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">left_align</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">string</span> <span class="k">unless</span> <span class="n">string</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sr">/^(\s+)\S/</span><span class="p">)</span>
+
+      <span class="n">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;  &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lines</span>
+
+      <span class="n">first_line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">select</span> <span class="p">{</span><span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">present?</span><span class="p">}</span><span class="o">.</span><span class="n">first</span>
+
+      <span class="n">leading_white_space</span> <span class="o">=</span> <span class="n">first_line</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sr">/^(\s+)\S/</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">length</span>
+
+      <span class="n">aligned_string</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+        <span class="n">line</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/^\s{</span><span class="si">#{</span><span class="n">leading_white_space</span><span class="si">}</span><span class="sr">}/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+      <span class="k">end</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

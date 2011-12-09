@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>generator.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="document.html">document.rb</a>
+          <a class="source" href="example.html">example.rb</a>
+          <a class="source" href="generator.html">generator.rb</a>
+          <a class="source" href="markdown_helper.html">markdown_helper.rb</a>
+          <a class="source" href="reference.html">reference.rb</a>
+          <a class="source" href="section.html">section.rb</a>
+          <a class="source" href="version.html">version.rb</a>
+          <a class="source" href="view_helper.html">view_helper.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>generator.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>&ndash;<em>&ndash; encoding: utf-8 &ndash;</em>&ndash;</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;fileutils&#39;</span>
+
+<span class="k">module</span> <span class="nn">ApiGuides</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>The generator creates a static html document for each different
+language you have examples for. You only ever interact
+with the Generator. It scans the specified directory for XML
+files and parses them into Documents. It then uses the documents
+to create the HTML file.</p>
+
+<p>The output is directly inspired by <a href="https://stripe.com/docs/api">Stripe</a>
+(which is Docco inspired). We mix it with a hint of Twitter bootstrap
+and <em>poof!</em> We have documentation.</p>
+
+<p>The Generator only needs to know 4 things.</p>
+
+<ol>
+<li>The absolute path to the folder containing all the XML files.</li>
+<li>The absolute path to the folder to generate the static site.</li>
+<li>What language is the default aka which languages go in <code>index.html</code>.</li>
+<li>The site title. This goes in the <code>&lt;title&gt;</code> and the top nav bar.</li>
+</ol>
+
+<p>You may also configure the generator with a logo which will be copied
+into the site directory.</p>
+
+<p>The generator creates a static site following this structure:</p>
+
+<pre><code>/
+|&ndash; sytle.css
+|&ndash; logo.png
+|&ndash; index.html
+|&ndash; ruby.html
+|&ndash; phython.html
+|&ndash; objective_c.html
+</code></pre>
+
+<p>Once you have the site you can use any webserver you want to serve it up!</p>
+
+<p>You can refer to Readme for an example of serving it for free with heroku.</p>
+
+<p>You can instantiate a new Generator without any arguments.
+You should assign the individual configuration options via
+the accessors. Here is an example:</p>
+
+<pre><code>generator = ApiGuides::Generator.new
+generator.source_path = &ldquo;/path/to/guides/folder&rdquo;
+generator.site_path = &ldquo;/path/to/site/folder&rdquo;
+generator.default = &ldquo;json&rdquo;
+generator.title = &ldquo;Slick API docs&rdquo;
+generator.logo = &ldquo;/path/to/logo.png&rdquo;
+
+# whatever else you need to do
+
+generator.generate
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">class</span> <span class="nc">Generator</span>
+    <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Memoizable</span>
+
+    <span class="kp">attr_accessor</span> <span class="ss">:source_path</span><span class="p">,</span> <span class="ss">:site_path</span><span class="p">,</span> <span class="ss">:default</span><span class="p">,</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:logo</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>You can instatiate a new generator by passing a hash of attributes
+and values. </p>
+
+<pre><code>Generator.new({
+  :source_path =&gt; File.dir_name(__FILE__) + &ldquo;/guides&rdquo;
+  :site_path =&gt; File.dir_name(__FILE__) + &ldquo;/source&rdquo;
+})
+</code></pre>
+
+<p>You can also omit the hash if you like.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{})</span>
+      <span class="n">attributes</span><span class="o">.</span><span class="n">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+        <span class="nb">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>Parse all the documents and generate the different HTML files.</p>
+
+<p>This method will remove <code>source_path/*</code> and <code>site_path/*</code> to
+ensure that a clean site is generated each time.</p>
+
+<p>It reads all the xml documents according to <code>source_path/**/*.xml</code> 
+and uses them to create the HTML.</p>
+
+<p>Documents are rendered in the order specified <code>#position</code>.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">generate</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>Ensure site is a directory</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="no">FileUtils</span><span class="o">.</span><span class="n">mkdir_p</span> <span class="n">site_path</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>If there is more than one language, then we need to create
+multiple files, one for each language.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="k">if</span> <span class="n">languages</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="mi">1</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-7'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-7">&#182;</a>
+        </div>
+        <p>Enter the most dastardly loop. 
+Create a View::Document with sections only containing the 
+specified language. </p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>        <span class="n">languages</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">language</span><span class="o">|</span>
+          <span class="n">document_views</span> <span class="o">=</span> <span class="n">documents</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
+            <span class="n">document</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">section</span><span class="o">|</span>
+              <span class="n">section</span><span class="o">.</span><span class="n">examples</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">select</span> <span class="p">{</span><span class="o">|</span><span class="n">ex</span><span class="o">|</span> <span class="n">ex</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">blank?</span> <span class="o">||</span> <span class="n">ex</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="n">language</span> <span class="p">}</span>
+              <span class="n">section</span>
+            <span class="k">end</span>
+
+            <span class="no">Views</span><span class="o">::</span><span class="no">Document</span><span class="o">.</span><span class="n">new</span> <span class="n">document</span>
+          <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-8'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-8">&#182;</a>
+        </div>
+        <p>Use Mustache to create the file</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>          <span class="n">page</span> <span class="o">=</span> <span class="no">Page</span><span class="o">.</span><span class="n">new</span>
+          <span class="n">page</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+          <span class="n">page</span><span class="o">.</span><span class="n">logo</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">basename</span> <span class="n">logo</span> <span class="k">if</span> <span class="n">logo</span>
+          <span class="n">page</span><span class="o">.</span><span class="n">documents</span> <span class="o">=</span> <span class="n">document_views</span>
+
+          <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">language</span><span class="o">.</span><span class="n">underscore</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="n">page</span><span class="o">.</span><span class="n">render</span>
+          <span class="k">end</span>
+        <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-9'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-9">&#182;</a>
+        </div>
+        <p>copy the default language to the index and were done!</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>        <span class="no">FileUtils</span><span class="o">.</span><span class="n">cp</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">default</span><span class="o">.</span><span class="n">underscore</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/index.html&quot;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-10'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-10">&#182;</a>
+        </div>
+        <p>There are no languages specified, so we can just create one page
+using a collection of Document::View.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="k">else</span> 
+        <span class="n">document_views</span> <span class="o">=</span> <span class="n">documents</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
+          <span class="no">Views</span><span class="o">::</span><span class="no">Document</span><span class="o">.</span><span class="n">new</span> <span class="n">document</span>
+        <span class="k">end</span>
+
+        <span class="n">page</span> <span class="o">=</span> <span class="no">Page</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">page</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="n">page</span><span class="o">.</span><span class="n">logo</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">basename</span> <span class="n">logo</span> <span class="k">if</span> <span class="n">logo</span>
+        <span class="n">page</span><span class="o">.</span><span class="n">documents</span> <span class="o">=</span> <span class="n">document_views</span>
+
+        <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/index.html&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+          <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="n">page</span><span class="o">.</span><span class="n">render</span>
+        <span class="k">end</span>
+      <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-11'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-11">&#182;</a>
+        </div>
+        <p>Copy the logo if specified</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="no">FileUtils</span><span class="o">.</span><span class="n">cp</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">logo</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="no">File</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">logo</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-12'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-12">&#182;</a>
+        </div>
+        <p>Copy all the stylesheets into the static directory and that&rsquo;s it!</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">resources_path</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span> <span class="s2">&quot;../resources&quot;</span><span class="p">,</span> <span class="bp">__FILE__</span>
+
+      <span class="no">FileUtils</span><span class="o">.</span><span class="n">cp</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">resources_path</span><span class="si">}</span><span class="s2">/style.css&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/style.css&quot;</span>
+      <span class="no">FileUtils</span><span class="o">.</span><span class="n">cp</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">resources_path</span><span class="si">}</span><span class="s2">/syntax.css&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">site_path</span><span class="si">}</span><span class="s2">/syntax.css&quot;</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-13'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-13">&#182;</a>
+        </div>
+        <p>Parse and sort all the documents specified recusively in the <code>source_path</code></p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">documents</span>
+      <span class="no">Dir</span><span class="o">[</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">/**/*.xml&quot;</span><span class="o">].</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span>
+        <span class="no">Document</span><span class="o">.</span><span class="n">from_xml</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+      <span class="k">end</span><span class="o">.</span><span class="n">sort</span> <span class="p">{</span><span class="o">|</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="o">|</span> <span class="n">d1</span><span class="o">.</span><span class="n">position</span> <span class="o">&lt;=&gt;</span> <span class="n">d2</span><span class="o">.</span><span class="n">position</span> <span class="p">}</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-14'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-14">&#182;</a>
+        </div>
+        <p>Loop all the document&rsquo;s sections and examples to see all the different
+languages specified by this document.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">languages</span>
+      <span class="n">documents</span><span class="o">.</span><span class="n">collect</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:sections</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="o">.</span><span class="n">collect</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:examples</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:language</span><span class="p">)</span><span class="o">.</span><span class="n">compact</span><span class="o">.</span><span class="n">uniq</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-15'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-15">&#182;</a>
+        </div>
+        <p>Store this calculation for later so we don&rsquo;t have to do this retarded loop again.</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="n">memoize</span> <span class="ss">:languages</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

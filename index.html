@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>document.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="document.html">document.rb</a>
+          <a class="source" href="example.html">example.rb</a>
+          <a class="source" href="generator.html">generator.rb</a>
+          <a class="source" href="markdown_helper.html">markdown_helper.rb</a>
+          <a class="source" href="reference.html">reference.rb</a>
+          <a class="source" href="section.html">section.rb</a>
+          <a class="source" href="version.html">version.rb</a>
+          <a class="source" href="view_helper.html">view_helper.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>document.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>&ndash;<em>&ndash; encoding: utf-8 &ndash;</em>&ndash;</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;active_support/core_ext/object&#39;</span>
+
+<span class="k">module</span> <span class="nn">ApiGuides</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>The document class models the raw information in each guide.</p>
+
+<p>The document is parsed according to this format:</p>
+
+<pre><code>&lt;document&gt;
+  &lt;title&gt;Top Level Header&lt;/title&gt;
+  &lt;position&gt;1&lt;&gt;
+  &lt;section title=&ldquo;Level Two Header&rdquo;&gt;
+    &lt;docs&gt;
+      Insert your markdown here
+    &lt;/docs&gt;
+    &lt;reference title=&ldquo;Example1&rdquo;&gt;
+      A Reference element will always be shown with the associated section.
+      You should use this area to provide technical documentation
+      for each section. You could use the &lt;docs&gt;&rsquo;s element to
+      describe how each thing works, and use the reference to show
+      a method signature with return values.
+
+      Write your reference with markdown.
+
+      You can use standard markdown syntax plus 
+      helpers added by this library
+    &lt;/reference&gt;
+    &lt;examples&gt;
+      &lt;example language=&ldquo;ruby&rdquo;&gt;&lt;![CDATA[
+        Insert your markdown here.
+
+        You can use github fenced codeblocks to create syntax 
+        highlighting like this:
+
+        &ldquo;ruby
+        # note you don&rsquo;t have to indent!
+        def method_name(arg)
+          # do stuff
+        end
+        &rdquo;
+
+        You can also specify code like you would in normal markdown
+        by indenting by 2 tabs or 4 spaces:
+
+            // here is an example data structure
+            {
+              &ldquo;foo&rdquo;: &ldquo;bar&rdquo;
+            }
+
+        **Note!** All content will be automatically left 
+        aligned so you can indent your markup to make 
+        it easier to read. 
+      ]]&gt;&lt;/example&gt;
+      &lt;example language=&ldquo;javascript&rdquo;&gt;&lt;![CDATA[
+        Insert more markdown here
+      ]]&gt;&lt;/example&gt;
+    &lt;/examples&gt;
+  &lt;/section&gt;
+&lt;/document&gt;
+</code></pre>
+
+<p><strong>Important</strong>: Be sure to wrap your text tags with <code>&lt;![CDATA[ ]]&gt;</code> otherwise
+ the file may not parse correctly since it may not be valid XML.</p>
+
+<p><code>title</code> element names this section of the guide.</p>
+
+<p><code>position</code> element determines the order to render the document. 
+This allows you to have multiple documents in any structure you want.</p>
+
+<p>You can have has many sections as you want. You should only have one 
+<doc> block. You can have have <examples> if you want. There can be
+as many <example>&rsquo;s inside if you want. Another copy of the site will
+be generated for each language. </p>
+
+<p>The markdown is parsed <a href="http://github.github.com/github-flavored-markdown/">Github Markdown</a>.
+Code is highlighted using <a href="http://pygments.org/">pygments</a>.</p>
+
+<p>This class parses the table of contents for each document into a TableOfContents instance.
+It also parses an array of Section instances. The Generator uses this information
+to generate the final files.</p>
+
+<p>You may choose to indent your tags or not. All content will be
+left-aligned so code and other indentation senstive markdown will be
+parsed correctly.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">class</span> <span class="nc">Document</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>Use ActiveSupport to memoize parsing methods</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Memoizable</span>
+
+    <span class="kp">attr_accessor</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:position</span><span class="p">,</span> <span class="ss">:sections</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{})</span>
+      <span class="n">attributes</span><span class="o">.</span><span class="n">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="kp">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+        <span class="nb">send</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="kp">attr</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="n">value</span>
+      <span class="k">end</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>Takes XML and parses into into a Document
+instance. It wil also parse the section
+using its <code>from_xml</code> method.</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_xml</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+      <span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">XML</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span><span class="o">.</span><span class="n">at_xpath</span><span class="p">(</span><span class="s1">&#39;//document&#39;</span><span class="p">)</span>
+      <span class="n">document</span> <span class="o">=</span> <span class="no">Document</span><span class="o">.</span><span class="n">new</span> <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="n">doc</span><span class="o">.</span><span class="n">at_xpath</span><span class="p">(</span><span class="s1">&#39;./title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">try</span><span class="p">(</span><span class="ss">:content</span><span class="p">),</span> 
+        <span class="ss">:position</span> <span class="o">=&gt;</span> <span class="n">doc</span><span class="o">.</span><span class="n">at_xpath</span><span class="p">(</span><span class="s1">&#39;./position&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">try</span><span class="p">(</span><span class="ss">:content</span><span class="p">)</span><span class="o">.</span><span class="n">try</span><span class="p">(</span><span class="ss">:to_i</span><span class="p">)</span>
+
+      <span class="n">document</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//section&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">section_xml</span><span class="o">|</span> <span class="no">Section</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">section_xml</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span> <span class="p">}</span>
+
+      <span class="n">document</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
