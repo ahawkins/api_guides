@@ -1,5 +1,8 @@
 # API Guides
 
+**Example (and primary use case)**:
+[http://developer.radiumcrm.com](http://developer.radiumcrm.com)
+
 `ApiGuides` is a simple static generator based off Docco. It is
 specifically designed to handle writing documentation for HTTP APIs,
 however it should be flexible enough to work in many other situations as
@@ -174,7 +177,7 @@ some example XML documents and generated table of contents.
 ## Markdown
 
 I love Markdown. It's mucher easy to read and write than textile.
-[Redcarpet](#) is used for parsing. It includes some more features like
+[Redcarpet](https://github.com/tanoku/redcarpet) is used for parsing. It includes some more features like
 fenced code blocks with language specification (yay!), tables, and a few
 other tricks. You can read their documentation for the complete list of
 available features. You may also include HTML inside the markdown,
@@ -182,7 +185,7 @@ however, you cannot use markdown inside the HTML. Common use case for
 HTML is `<dl>`. Definition lists are part of PHP markdown extra and not
 supported by Redcarpet.
 
-[Pygments](#) is used for syntax highlighting. The generator uses the
+[Pygments](http://pygments.org/) is used for syntax highlighting. The generator uses the
 pygments webservice so you don't have to worry about installing anything
 python related on your machine. It supports a very large variety of
 different languages and the generator includes a theme to make all of
@@ -271,7 +274,7 @@ details.
 
 Since the generating documentation is just static HTML, CSS, and images
 we can deploy to any web server very easily. This section shows you how
-to write a simple [Rack](#) server so you can deploy it to Heroku.
+to write a simple [Rack](http://rack.rubyforge.org/) server so you can deploy it to Heroku.
 
 First, create `config.ru` file in your directory. Here are the contents:
 
@@ -317,12 +320,12 @@ $ heroku open
 
 ## Credits
 
-* [Docco](#) - For creating the original style. CSS taken from source
+* [Docco](http://jashkenas.github.com/docco/) - For creating the original style. CSS taken from source
   with some modifications.
-* [Stripe](#) - For inspiring more complex documentation and layout.
+* [Stripe](https://stripe.com/docs/api) - For inspiring more complex documentation and layout.
   Although, I think this came out better!
-* [Rocco](#) - For demonstrating how to use Mustache
-* [Twitter Boostrap](#) - For the navbar. I only took what I needed and
+* [Rocco](https://github.com/rtomayko/rocco) - For demonstrating how to use Mustache
+* [Twitter Boostrap](http://twitter.github.com/bootstrap) - For the navbar. I only took what I needed and
   repackaged them into the `#topbar` selector.
 
 ## Hacking
@@ -338,5 +341,3 @@ Documentation is written for Rocco. You can read the annotated source
 ## License
 
 MIT.
-
-
