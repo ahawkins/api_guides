@@ -336,7 +336,7 @@ if you do cool stuff.
 ## Documentation
 
 Documentation is written for Rocco. You can read the annotated source
-[here](http://adman65.github.com/api_guides).
+[here](http://threadedlabs.github.com/api_guides).
 
 ## License
 
