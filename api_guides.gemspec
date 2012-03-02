@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["me@broadcastingadam.com"]
   gem.description   = %q{Generate HTML documentation for your program with markdown and examples for different languages.}
   gem.summary       = %q{}
-  gem.homepage      = "https://github.com/adman65/api_guides"
+  gem.homepage      = "https://github.com/threadedlabs/api_guides"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
