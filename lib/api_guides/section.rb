@@ -49,7 +49,7 @@ module ApiGuides
     def self.from_xml(xml)
       doc = Nokogiri::XML.parse(xml).at_xpath('//section')
       section = Section.new :title => doc.attributes['title'].try(:value)
-      section.docs = doc.at_xpath('./docs').content
+      section.docs = doc.at_xpath('./docs').content if doc.at_xpath('./docs')
 
       if reference_xml = doc.at_xpath('./reference')
         section.reference = Reference.from_xml(reference_xml.to_s)
