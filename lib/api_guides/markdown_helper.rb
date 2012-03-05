@@ -8,7 +8,7 @@ module ApiGuides
     class HTMLwithHighlighting < ::Redcarpet::Render::HTML
       # Override the default so we can do syntax highlighting
       # based on the language
-      def block_code(code, language)
+      def bblock_code(code, language)
         # If there's a language, use the pygments webservice
         # to highlight for the language
         if language
@@ -16,10 +16,8 @@ module ApiGuides
             URI.parse('http://pygments.appspot.com/'),
             {'lang' => language, 'code' => code}
           ).body
-
-        # fallback to standar
         else
-          super(code, language)
+         %Q{<code class="#{language}"><pre>#{code}></pre></code>}
         end
       end
     end
