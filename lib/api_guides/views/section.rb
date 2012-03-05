@@ -19,7 +19,7 @@ module ApiGuides
       end
 
       def docs
-        markdown @section.docs
+        markdown @section.docs if @section.docs
       end
 
       def reference
