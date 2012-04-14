@@ -49,11 +49,15 @@ module ApiGuides
 
       first_line = lines.select {|l| l.present?}.first
 
-      leading_white_space = first_line.match(/^(\s+)\S/)[1].length
+      if first_line =~ /^(\s+)\S/
+        whitespace = $~[1]
 
-      aligned_string = lines.map do |line|
-        line.gsub(/^\s{#{leading_white_space}}/, '')
-      end.join('')
+        aligned_string = lines.map do |line|
+          line.gsub(/^\s{#{whitespace.length}}/, '')
+        end.join('')
+      else
+        string
+      end
     end
   end
 end

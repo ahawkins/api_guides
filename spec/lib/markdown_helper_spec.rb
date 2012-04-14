@@ -54,4 +54,8 @@ all lines with the leading line
   it "should align the string" do
     subject.left_align(indented_string).should == aligned_string
   end
+
+  it "should handle an unaligne string" do
+    subject.left_align(aligned_string).should == aligned_string
+  end
 end
