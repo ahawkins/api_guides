@@ -52,8 +52,6 @@ module ApiGuides
   #
   #     generator.generate
   class Generator
-    extend ActiveSupport::Memoizable
-
     attr_accessor :source_path, :site_path, :default, :title, :logo
 
     # You can instatiate a new generator by passing a hash of attributes
@@ -153,9 +151,7 @@ module ApiGuides
     # Loop all the document's sections and examples to see all the different
     # languages specified by this document.
     def languages
-      documents.collect(&:sections).flatten.collect(&:examples).flatten.map(&:language).compact.uniq
+      @languages ||= documents.collect(&:sections).flatten.collect(&:examples).flatten.map(&:language).compact.uniq
     end
-    # Store this calculation for later so we don't have to do this retarded loop again.
-    memoize :languages
   end
 end
