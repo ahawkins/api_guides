@@ -6,7 +6,7 @@
 `ApiGuides` is a simple static generator based off Docco. It is
 specifically designed to handle writing documentation for HTTP APIs,
 however it should be flexible enough to work in many other situations as
-well. The generator will create HTML, CSS, an optional logo image inside
+well. The generator will create HTML, CSS, and an optional logo image inside
 a directory. You can deploy the site using any web server or Heroku if
 you like.
 
@@ -23,17 +23,17 @@ with these things in mind:
    repos or separate files.
 7. You want to link to specific sections of documentation from within
    other sections of documentation.
-8. You have **alot** of documentation to write. This generator all works
+8. You have **a lot** of documentation to write. This generator also works
    well with small about of documentation as well.
-9. You want something that looks pretty, is easy to read, and don't want
-   to make any CSS decisions or worry presentational issues.
+9. You want something that looks pretty and is easy to read, and you don't 
+   want to make any CSS decisions or worry about presentational issues.
 
 If you think most of those things sound good then read on.
 
 ## Structuring Documentation
 
 Raw documenation is kept in XML files with content written in Markdown.
-I've choosen XML because it is great at storing and organizing large
+I've chosen XML because it is great at storing and organizing large
 amounts of text. Don't worry, you won't have to mess with XML that much.
 
 You can (and should) structure your documenation in separate files. You
@@ -98,7 +98,7 @@ may include `<examples>` or `<reference>` if you wish, but you should
 always include `<docs>`. The examples and reference material will always
 be shown with the associated docs. You can omit `<docs>` but that
 doesn't make any sense! Who's going to figure out what they're doing
-without the docs.
+without the docs?
 
 ### The reference Element
 
@@ -124,7 +124,7 @@ language specified in your documents.
 
 ### General Output
 
-Your docs will always be show on the left. If a reference is present, it
+Your docs will always be shown on the left. If a reference is present, it
 will be shown exactly opposite of the docs. If examples are present,
 they will be shown below the reference.
 
@@ -176,12 +176,12 @@ some example XML documents and generated table of contents.
 
 ## Markdown
 
-I love Markdown. It's mucher easy to read and write than textile.
+I love Markdown. It's much easier to read and write than textile.
 [Redcarpet](https://github.com/tanoku/redcarpet) is used for parsing. It includes some more features like
 fenced code blocks with language specification (yay!), tables, and a few
 other tricks. You can read their documentation for the complete list of
-available features. You may also include HTML inside the markdown,
-however, you cannot use markdown inside the HTML. Common use case for
+available features. You may also include HTML inside the markdown, but
+you cannot use markdown inside the HTML. A common use case for
 HTML is `<dl>`. Definition lists are part of PHP markdown extra and not
 supported by Redcarpet.
 
@@ -193,8 +193,8 @@ them look nice and pretty.
 
 ## Linking
 
-You can also link to sections, documents, or references through out your
-documentation. Each element will be given an ID which you can use to
+You can also link to sections, documents, or references throughout your
+documentation. Each element will be given an ID that you can use to
 create an anchor link for. They are prefaced with `d`, `s` or `r`
 depending on what they are. This is to prevent duplication. The titles
 are are dasherized aka permalinks. Here are some examples:
@@ -207,7 +207,7 @@ are are dasherized aka permalinks. Here are some examples:
 
 ## Installation and Use
 
-Firs thing you'll need to do is install ruby. I'm assuming you already
+First thing you'll need to do is install Ruby. I'm assuming you already
 have this installed or know how to install for your operating system.
 After that, you can simply install the gem.
 
@@ -266,13 +266,13 @@ details.
   documents.
 * `:site_path`: Absolute path for the generated files
 * `:title`: It goes in the navbar and the `<title>` in the finished HTML
-* `:default`: Required if there are more than one lanauges. This sets
+* `:default`: Required if there is more than one language. This sets
   the examples on the index page.
 * `:logo`: _Optional_. Absolute path to an image to put in the navbar.
 
 ## Deploying
 
-Since the generating documentation is just static HTML, CSS, and images
+Since the generated documentation is just static HTML, CSS, and images
 we can deploy to any web server very easily. This section shows you how
 to write a simple [Rack](http://rack.rubyforge.org/) server so you can deploy it to Heroku.
 
