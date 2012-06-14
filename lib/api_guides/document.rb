@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-require 'active_support/core_ext/object'
-
 module ApiGuides
   # The document class models the raw information in each guide.
   #
@@ -84,9 +82,6 @@ module ApiGuides
   # left-aligned so code and other indentation senstive markdown will be
   # parsed correctly.
   class Document
-    # Use ActiveSupport to memoize parsing methods
-    extend ActiveSupport::Memoizable
-
     attr_accessor :title, :position, :sections
 
     def initialize(attributes = {})
